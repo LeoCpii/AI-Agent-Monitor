@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "ESNext",
+        "jsx": "preserve",
+        "importHelpers": true,
+        "moduleResolution": "Bundler",
+        "experimentalDecorators": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
+        "sourceMap": true,
+        "types": [
+            "jest",
+            "node",
+        ]
+    },
+    "exclude": [
+        "node_modules",
+        "build",
+        "dist",
+        "**/__mocks__",
+        "**/tests",
+        "**/*.spec.tsx",
+        "**/*.spec.ts"
+    ]
+}

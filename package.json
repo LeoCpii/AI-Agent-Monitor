@@ -1,0 +1,27 @@
+{
+  "name": "ai-monitor",
+  "version": "1.0.0",
+  "author": "leonardo.goncalves <leogoncalves.contato@gmail.com>",
+  "private": true,
+  "main": "index.js",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "lint": "yarn workspaces foreach -ptv run lint",
+    "build": "yarn workspaces foreach -ptv run build",
+    "test": "yarn workspaces foreach -ptv run test"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "eslint": "^9.39.2",
+    "eslint-plugin-import-helpers": "^2.0.1",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.5.0",
+    "jest": "^30.2.0",
+    "typescript": "latest",
+    "typescript-eslint": "^8.50.1"
+  },
+  "packageManager": "yarn@3.2.1"
+}

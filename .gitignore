@@ -1,0 +1,70 @@
+.DS_Store
+node_modules
+dist
+storybook-static
+package-lock.json
+
+.sentryclirc
+.npmrc
+
+videos/
+screenshots/
+coverage/
+
+#ENV
+.env
+.env.local
+.env.stg
+.env.qa
+.env.prod
+.env.test
+
+# SSR
+node_modules
+*.log*
+.nuxt
+.nitro
+.cache
+.output
+
+# next.js
+.next/
+.vercel
+out/
+.lighthouseci/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Yarn files
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Firebase cache
+.firebase/
+firebase-debug.log*
+firebase-debug.*.log*
+
+# Firebase Hosting
+**/.firebase
+firebase-debug.log
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
