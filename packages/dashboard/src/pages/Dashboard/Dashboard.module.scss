@@ -1,0 +1,53 @@
+.dashboard {
+  min-height: 100vh;
+  padding-bottom: 48px;
+  padding-top: 32px;
+}
+
+.header {
+  align-items: flex-end;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+:global(.dashboardFilters) {
+  align-items: end;
+}
+
+:global(.heatMap) {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: minmax(90px, 1fr) repeat(auto-fit, minmax(110px, 1fr));
+  overflow-x: auto;
+}
+
+:global(.heatMapCell) {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  padding: 12px;
+  text-align: right;
+}
+
+.tableOverflow {
+  overflow-x: auto;
+}
+
+@media (max-width: 720px) {
+  .dashboard {
+    padding: 20px 16px 32px;
+  }
+
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  :global(.dashboardFilters) {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+}
