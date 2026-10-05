@@ -2,38 +2,54 @@ import type { FastifyInstance } from 'fastify';
 
 import {
   findModelRequests,
-  getModelRequestStats,
+  getModelMetrics,
   getModelRequestsSummary,
   getModelPerformanceStats,
 } from './model.repository';
+import { parseModelMetricsQuery } from './model.analytics';
+
+function parseLimit(value: unknown) {
+  const parsed = Number(value ?? 100);
+
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    throw new Error('limit must be a positive integer');
+  }
+
+  return Math.min(parsed, 500);
+}
 
 export default async function modelRoutes(app: FastifyInstance) {
   app.get('/model/performance', async () => {
     return getModelPerformanceStats();
   });
 
-  app.get('/model/requests', async (request) => {
-    const query = request.query as {
-      limit?: string;
-    };
+  app.get('/model/requests', async (request, reply) => {
+    try {
+      const query = parseModelMetricsQuery(request.query, new Date());
+      const limit = parseLimit((request.query as Record<string, unknown>).limit);
+      const requests = await findModelRequests(query, limit);
 
-    const limit = Math.min(
-      Number(query.limit ?? 100),
-      500
-    );
-
-    const requests = await findModelRequests(
-      limit
-    );
-
-    return { requests };
+      return { requests };
+    } catch (error) {
+      return reply.code(400).send({
+        error: error instanceof Error ? error.message : 'Invalid query',
+      });
+    }
   });
 
   app.get('/model/request/summary', async () => {
     return getModelRequestsSummary();
   });
 
-  app.get('/model/request/stats', async () => {
-    return getModelRequestStats();
+  app.get('/model/request/stats', async (request, reply) => {
+    try {
+      const query = parseModelMetricsQuery(request.query, new Date());
+
+      return getModelMetrics(query);
+    } catch (error) {
+      return reply.code(400).send({
+        error: error instanceof Error ? error.message : 'Invalid query',
+      });
+    }
   });
 }

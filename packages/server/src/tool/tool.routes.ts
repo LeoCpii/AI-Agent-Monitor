@@ -1,4 +1,5 @@
 import type { FastifyInstance } from 'fastify';
+
 import { findToolCalls, getToolCallStats } from './tool.repository';
 
 export default async function modelRoutes(app: FastifyInstance) {

@@ -8,30 +8,10 @@ import type {
 
 import { db } from '../database/db';
 import { modelRequests } from '../database/schema';
+import { saveModelRequest as persistModelRequest } from '../model/model.repository';
 
 export async function saveModelRequest(request: ModelRequest) {
-  await db
-    .insert(modelRequests)
-    .values({
-      id: request.id,
-      cost: request.cost,
-      agent: request.agent,
-      model: request.model,
-      finish: request.finish,
-      provider: request.provider,
-      sessionId: request.sessionId,
-      directory: request.directory,
-      createdAt: request.createdAt,
-      durationMs: request.durationMs,
-      completedAt: request.completedAt,
-      totalTokens: request.tokens.total,
-      inputTokens: request.tokens.input,
-      outputTokens: request.tokens.output,
-      reasoningTokens: request.tokens.reasoning,
-      cacheReadTokens: request.tokens.cacheRead,
-      cacheWriteTokens: request.tokens.cacheWrite,
-    })
-    .onConflictDoNothing();
+  await persistModelRequest(request);
 }
 
 export async function findModelRequests(
@@ -43,7 +23,7 @@ export async function findModelRequests(
     .orderBy(
       desc(modelRequests.completedAt)
     )
-    .limit(limit)
+    .limit(limit);
 }
 
 export async function getModelRequestsSummary() {

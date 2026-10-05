@@ -10,6 +10,7 @@ package-lock.json
 videos/
 screenshots/
 coverage/
+.superpowers/
 
 #ENV
 .env

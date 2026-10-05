@@ -8,17 +8,22 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "test": "vitest run",
+    "lint": "eslint src --ext ts --report-unused-disable-directives --max-warnings 0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^26.6.4",
     "drizzle-kit": "^0.31.11",
+    "eslint": "^9.39.2",
     "tsx": "^4.23.15",
-    "typescript": "latest",
-    "typescript-eslint": "^8.26.0"
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.26.0",
+    "vitest": "^3.2.7"
   },
   "dependencies": {
+    "@ai-monitor/dto": "workspace:*",
     "@fastify/cors": "^11.3.0",
     "better-sqlite3": "^12.11.1",
     "drizzle-orm": "^0.45.3",

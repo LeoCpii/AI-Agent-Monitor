@@ -3,7 +3,6 @@ import type { FastifyInstance } from 'fastify';
 import type { OpenCodeEvent } from '@ai-monitor/dto/opencode';
 
 import { completeToolCall, startToolCall } from '../tool/tool.repository';
-
 import { saveModelRequest } from './opencode.repository';
 import { addOpenCodeEvent, getOpenCodeEvents, subscribeToOpenCodeEvents } from './opencode.store';
 import { parseModelRequest, parseToolCallCompleted, parseToolCallStarted } from './opencode.parser';
