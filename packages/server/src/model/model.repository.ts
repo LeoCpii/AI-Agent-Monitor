@@ -3,70 +3,59 @@ import { desc } from 'drizzle-orm';
 import type {
   ModelPerformanceItem,
   ModelPerformanceStats,
+  ModelMetricsQuery,
+  ModelMetricsResponse,
   ModelRequest,
+  RecentModelRequest,
   ModelRequestStats,
   ModelRequestSummaryItem
 } from '@ai-monitor/dto/model';
 
 import { db } from '../database/db';
+import { createMetricsRepository } from '../database/metrics.repository';
 import { modelRequests, toolCalls } from '../database/schema';
+import {
+  aggregateModelRequests,
+  matchesModelMetricsQuery,
+  toRecentModelRequest,
+} from './model.analytics';
 
 interface SessionInfo {
   provider: string;
   model: string;
 }
 
+const metricsRepository = createMetricsRepository(db);
+
 export async function saveModelRequest(request: ModelRequest) {
-  await db
-    .insert(modelRequests)
-    .values({
-      id: request.id,
-
-      sessionId: request.sessionId,
-
-      agent: request.agent,
-
-      provider: request.provider,
-
-      model: request.model,
-
-      totalTokens: request.tokens.total,
-
-      inputTokens: request.tokens.input,
-
-      outputTokens: request.tokens.output,
-
-      reasoningTokens: request.tokens.reasoning,
-
-      cacheReadTokens: request.tokens.cacheRead,
-
-      cacheWriteTokens: request.tokens.cacheWrite,
-
-      cost: request.cost,
-
-      durationMs: request.durationMs,
-
-      finish: request.finish,
-
-      directory: request.directory,
-
-      createdAt: request.createdAt,
-
-      completedAt: request.completedAt,
-    })
-    .onConflictDoNothing();
+  await metricsRepository.recordModelRequest(request);
 }
 
 export async function findModelRequests(
-  limit = 100
-) {
-  return db
+  query: ModelMetricsQuery,
+  limit: number
+): Promise<RecentModelRequest[]> {
+  const requests = await db
     .select()
     .from(modelRequests)
     .orderBy(
       desc(modelRequests.completedAt)
-    )
-    .limit(limit)
+    );
+
+  return requests
+    .filter(request => matchesModelMetricsQuery(request, query))
+    .slice(0, limit)
+    .map(toRecentModelRequest);
+}
+
+export async function getModelMetrics(
+  query: ModelMetricsQuery
+): Promise<ModelMetricsResponse> {
+  const requests = await db
+    .select()
+    .from(modelRequests);
+
+  return aggregateModelRequests(requests, query);
 }
 
 export async function getModelRequestsSummary() {

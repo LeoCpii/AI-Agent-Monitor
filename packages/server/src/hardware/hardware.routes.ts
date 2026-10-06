@@ -1,12 +1,8 @@
-import { desc } from 'drizzle-orm';
-
 import type { FastifyInstance } from 'fastify';
-
-import { db } from '../database/db';
-import { systemMetrics } from '../database/schema';
 
 import { getTelemetrySnapshot } from './hardware.services';
 import { getGpuMetrics, getOllamaStatus, getSystemMetrics } from './hardware.collectors';
+import { findTelemetryHistory, parseTelemetryHistoryQuery } from './hardware.repository';
 
 export default async function hardwareRoutes(app: FastifyInstance) {
   app.get('/hardware', async () => {
@@ -25,13 +21,15 @@ export default async function hardwareRoutes(app: FastifyInstance) {
     return getTelemetrySnapshot();
   });
 
-  app.get('/hardware/telemetry/history', async () => {
-    const result = await db
-      .select()
-      .from(systemMetrics)
-      .orderBy(desc(systemMetrics.id))
-      .limit(180);
+  app.get('/hardware/telemetry/history', async (request, reply) => {
+    try {
+      const query = parseTelemetryHistoryQuery(request.query);
 
-    return result.reverse();
+      return findTelemetryHistory(query);
+    } catch (error) {
+      return reply.code(400).send({
+        error: error instanceof Error ? error.message : 'Invalid query',
+      });
+    }
   });
 }

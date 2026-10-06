@@ -1,23 +1,13 @@
-import {
-  useMemo,
-  createContext,
-  type PropsWithChildren,
-} from "react";
+import { createContext, type PropsWithChildren } from 'react';
 
-interface MonitorContextConfig {
-
-}
+type MonitorContextConfig = Record<string, never>;
 
 export const MonitorContext = createContext<MonitorContextConfig>({});
 
 export default function MonitorProvider({ children }: PropsWithChildren) {
-  const context = useMemo<MonitorContextConfig>(() => ({
-
-  }), []);
-
   return (
-    <MonitorContext.Provider value={context}>
+    <MonitorContext.Provider value={{}}>
       {children}
     </MonitorContext.Provider>
-  )
+  );
 }

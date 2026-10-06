@@ -10,27 +10,37 @@
     "start:stg": "env-cmd -f .env.stg vite",
     "start:prod": "env-cmd -f .env.prod vite",
     "build": "tsc && vite build",
+    "test": "vitest run",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ai-monitor/dto": "workspace:*",
     "@iziui/react": "^0.0.110-rc",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-gtm-module": "^2.0.11",
+    "react-is": "^19.0.0",
     "react-router-dom": "^7.2.0",
-    "react-shadow": "^20.6.0"
+    "react-shadow": "^20.6.0",
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
     "env-cmd": "^10.1.0",
+    "eslint": "^9.39.2",
     "globals": "^16.0.0",
+    "jsdom": "^26.1.0",
     "sass": "^1.85.1",
-    "typescript": "latest",
+    "typescript": "~5.9.3",
     "typescript-eslint": "^8.26.0",
-    "vite": "^6.2.0"
+    "vite": "^6.2.0",
+    "vitest": "^3.2.7"
   },
   "peerDependencies": {
     "react": "^17.0.0 || ^18.0.0 || ^19.0.0",

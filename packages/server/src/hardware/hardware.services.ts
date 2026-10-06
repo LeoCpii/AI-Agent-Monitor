@@ -1,13 +1,14 @@
-import type { TelemetrySnapshot } from "@ai-monitor/dto/hardware";
+import type { TelemetrySnapshot } from '@ai-monitor/dto/hardware';
 
-import { db } from "../database/db";
-import { systemMetrics } from "../database/schema";
-
+import { db } from '../database/db';
+import { createMetricsRepository } from '../database/metrics.repository';
 import {
   getGpuMetrics,
   getOllamaStatus,
   getSystemMetrics
-} from "./hardware.collectors";
+} from './hardware.collectors';
+
+const metricsRepository = createMetricsRepository(db);
 
 export async function getTelemetrySnapshot() {
   const [gpu, ollama] = await Promise.all([
@@ -26,15 +27,5 @@ export async function getTelemetrySnapshot() {
 }
 
 export async function saveTelemetrySnapshot(telemetry: TelemetrySnapshot) {
-  await db.insert(systemMetrics).values({
-    timestamp: telemetry.timestamp,
-    gpuPowerWatts: telemetry.gpu.powerWatts,
-    gpuTemperature: telemetry.gpu.temperature,
-    gpuUtilization: telemetry.gpu.utilization,
-    gpuMemoryUsedMb: telemetry.gpu.memoryUsedMb,
-    gpuMemoryTotalMb: telemetry.gpu.memoryTotalMb,
-    cpuUsage: telemetry.system.cpuUsage,
-    memoryUsedMb: telemetry.system.memoryUsedMb,
-    memoryTotalMb: telemetry.system.memoryTotalMb,
-  });
+  await metricsRepository.recordTelemetrySnapshot(telemetry);
 }

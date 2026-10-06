@@ -1,8 +1,8 @@
 import Fastify from 'fastify';
+
 import cors from '@fastify/cors';
 
 import { startTelemetryPersistence } from './hardware/hardware.scheduler';
-
 import toolRoutes from './tool';
 import modelRoutes from './model';
 import healthRoutes from './health';

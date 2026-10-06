@@ -45,6 +45,63 @@ export interface ModelRequest {
   directory?: string;
 }
 
+export interface ModelMetricsQuery {
+  from: string;
+  to: string;
+  providers?: string[];
+  origins?: ('local' | 'remote')[];
+  agents?: string[];
+  models?: string[];
+}
+
+export interface ModelMetricsSummary {
+  requests: number;
+  totalTokens: number;
+  inputTokens: number;
+  outputTokens: number;
+  reasoningTokens: number;
+  cacheReadTokens: number;
+  cacheWriteTokens: number;
+  totalDurationMs: number;
+  averageDurationMs: number;
+  totalTokensPerSecond: number;
+  outputTokensPerSecond: number;
+}
+
+export interface ModelMetricsBucket extends ModelMetricsSummary {
+  from: string;
+  to: string;
+}
+
+export interface AgentModelMetrics extends ModelMetricsSummary {
+  agent: string;
+  provider: string;
+  model: string;
+  origin: 'local' | 'remote';
+}
+
+export interface ModelMetricsResponse {
+  summary: ModelMetricsSummary;
+  series: ModelMetricsBucket[];
+  agentModels: AgentModelMetrics[];
+}
+
+export interface RecentModelRequest {
+  completedAt: string;
+  agent: string;
+  provider: string;
+  model: string;
+  totalTokens: number;
+  inputTokens: number;
+  outputTokens: number;
+  reasoningTokens: number;
+  cacheReadTokens: number;
+  cacheWriteTokens: number;
+  durationMs: number;
+  totalTokensPerSecond: number;
+  outputTokensPerSecond: number;
+  finish?: string;
+}
 
 export interface ModelRequestSummaryItem {
   requests: number;
