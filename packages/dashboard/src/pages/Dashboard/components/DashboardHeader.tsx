@@ -1,6 +1,6 @@
 import type { TelemetrySnapshot } from '@ai-monitor/dto';
 
-import { Chip, Stack, Typography } from '@iziui/react';
+import { Button, Chip, Icon, Loading, Stack, Typography } from '@iziui/react';
 import type { HealthResponse } from '@/api/monitor';
 import type { DashboardResource } from '@/hooks/useMonitorDashboard';
 import { formatTime } from '@/utils/formatters';
@@ -9,14 +9,18 @@ interface DashboardHeaderProps {
   health: DashboardResource<HealthResponse>;
   telemetry: DashboardResource<TelemetrySnapshot>;
   lastUpdated?: Date;
+  isRefreshing: boolean;
+  onRefresh: () => void;
 }
 
 export default function DashboardHeader({
   health,
   telemetry,
   lastUpdated,
+  isRefreshing,
+  onRefresh,
 }: DashboardHeaderProps) {
-  const backendConnected = health.data?.status === 'ok';
+  const backendConnected = health.data?.status === 'ok' && !health.error;
   const ollamaHealthy = telemetry.data?.ollama.healthy;
 
   return (
@@ -34,31 +38,42 @@ export default function DashboardHeader({
         </Typography>
       </Stack>
       <Stack
-        gap={8}
-        alignItems="center"
-        flexDirection="row"
-        flexWrap="wrap"
-        justifyContent="flex-end"
+        alignItems="flex-end"
       >
-        <Chip
-          color={backendConnected ? 'success' : 'error'}
-          label={backendConnected ? 'Backend connected' : 'Backend disconnected'}
-          size="small"
-          variant="outlined"
-        />
-        {telemetry.data && (
+        <Stack
+          gap={8}
+          alignItems="center"
+          flexDirection="row"
+          flexWrap="wrap"
+          justifyContent="flex-end"
+        >
           <Chip
-            color={ollamaHealthy ? 'success' : 'default'}
-            label={ollamaHealthy ? 'Ollama healthy' : 'Ollama offline'}
+            color={backendConnected ? 'success' : 'error'}
+            label={backendConnected ? 'Backend connected' : 'Backend disconnected'}
             size="small"
             variant="outlined"
           />
-        )}
-        {lastUpdated && (
-          <Typography color="text.secondary" variant="body2">
-            Updated {formatTime(lastUpdated.toISOString())}
-          </Typography>
-        )}
+          {telemetry.data && (
+            <Chip
+              color={ollamaHealthy ? 'success' : 'default'}
+              label={ollamaHealthy ? 'Ollama healthy' : 'Ollama offline'}
+              size="small"
+              variant="outlined"
+            />
+          )}
+          {lastUpdated && (
+            <Typography color="text.secondary" variant="body2">
+              Updated {formatTime(lastUpdated.toISOString())}
+            </Typography>
+          )}
+        </Stack>
+        <Button
+          disabled={isRefreshing}
+          onClick={onRefresh}
+          startIcon={isRefreshing ? <Loading aria-label="Refreshing dashboard" /> : <Icon name="refresh" />}
+        >
+          {isRefreshing ? 'Refreshing...' : 'Refresh'}
+        </Button>
       </Stack>
     </Stack>
   );

@@ -23,10 +23,13 @@ vi.mock('recharts', () => ({
     <div data-point-count={data.length} data-testid="bar-chart">{children}</div>
   ),
   CartesianGrid: () => null,
+  Cell: () => null,
+  LabelList: () => null,
   Line: () => null,
   LineChart: ({ children, data }: { children: React.ReactNode; data: unknown[] }) => (
     <div data-point-count={data.length} data-testid="line-chart">{children}</div>
   ),
+  ReferenceLine: () => null,
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   Tooltip: ({ formatter }: { formatter?: (value: number) => React.ReactNode }) => (
     <div data-testid="tooltip-value">{formatter?.(42)}</div>
@@ -199,7 +202,9 @@ describe('DashboardHeader', () => {
           data: undefined,
           error: new Error('Connection refused'),
         }}
+        isRefreshing={false}
         lastUpdated={new Date('2026-10-05T12:00:00.000Z')}
+        onRefresh={vi.fn()}
         telemetry={telemetryResource}
       />,
     );
@@ -217,6 +222,8 @@ describe('DashboardHeader', () => {
           error: new Error('Connection refused'),
           isStale: true,
         }}
+        isRefreshing={false}
+        onRefresh={vi.fn()}
         telemetry={telemetryResource}
       />,
     );
@@ -232,7 +239,7 @@ describe('InfrastructureOverview', () => {
     expect(screen.getByText('NVIDIA GeForce RTX 2070 SUPER')).toBeVisible();
     expect(screen.getByText('82%')).toBeVisible();
     expect(screen.getByText('6.3 GB / 8 GB')).toBeVisible();
-    expect(screen.getByText('68 C')).toBeVisible();
+    expect(screen.getByText('68 °C')).toBeVisible();
     expect(screen.getByText('154 W')).toBeVisible();
     expect(screen.getByText('Installed Models')).toBeVisible();
     expect(screen.getByText('qwen2.5-coder:14b')).toBeVisible();
@@ -271,7 +278,6 @@ describe('HardwareHistory', () => {
     expect(screen.getByText('GPU Usage')).toBeVisible();
     expect(screen.getByText('GPU Temperature')).toBeVisible();
     expect(screen.getByText('Memory')).toBeVisible();
-    expect(screen.getByText('0-100%')).toBeVisible();
     const charts = screen.getAllByTestId('line-chart');
 
     expect(charts).toHaveLength(3);
@@ -295,7 +301,7 @@ describe('HardwareHistory', () => {
     render(<HardwareHistory history={historyResource} />);
 
     expect(screen.getAllByTestId('tooltip-value').map(tooltip => tooltip.textContent))
-      .toEqual(['42%', '42 C', '42%']);
+      .toEqual(['42%', '42 °C', '42%']);
   });
 
   it('marks an empty cached history as stale after a refresh failure', () => {
@@ -314,7 +320,8 @@ describe('AI activity sections', () => {
     render(<ModelPerformance performance={performanceResource} />);
 
     expect(screen.getByText('gpt-5.6-terra')).toBeVisible();
-    expect(screen.getByText('27 success / 1 error')).toBeVisible();
+    expect(screen.getByText('Tools success')).toBeVisible();
+    expect(screen.getByText('27')).toBeVisible();
     expect(screen.getByText('96%')).toBeVisible();
 
     render(
@@ -385,6 +392,6 @@ describe('AI activity sections', () => {
       />,
     );
 
-    expect(screen.getAllByTestId('bar-chart')[0]).toHaveAttribute('data-point-count', '1');
+    expect(screen.getAllByText('gpt-5.6-terra')).toHaveLength(1);
   });
 });

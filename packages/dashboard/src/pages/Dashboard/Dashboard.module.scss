@@ -2,9 +2,13 @@
   padding: 24px;
 }
 
-// .table {
-//   min-width: 760px;
-// }
+.table {
+  min-width: 760px;
+}
+
+.tableScroll {
+  overflow-x: auto;
+}
 
 .mono {
   font-family: Consolas, "Courier New", monospace;
@@ -33,7 +37,7 @@
     padding: 12px;
   }
 
-  // .table {
-  //   min-width: 680px;
-  // }
+  .table {
+    min-width: 680px;
+  }
 }

@@ -22,7 +22,7 @@ import {
   type HealthResponse,
 } from '@/api/monitor';
 
-const POLL_INTERVAL_MS = 30_000;
+const POLL_INTERVAL_MS = 10_000;
 const DAY_MS = 24 * 60 * 60 * 1_000;
 
 export interface DashboardResource<T> {
@@ -87,27 +87,35 @@ function toError(error: unknown) {
 export function useMonitorDashboard() {
   const [resources, setResources] = useState<DashboardResources>(createResources);
   const cycleRef = useRef(0);
+  const controllerRef = useRef<AbortController | undefined>(undefined);
+  const [refreshVersion, setRefreshVersion] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  function refresh() {
+    setIsRefreshing(true);
+    setRefreshVersion(current => current + 1);
+  }
 
   useEffect(() => {
-    let controller: AbortController | undefined;
-
-    function refresh() {
-      controller?.abort();
-      controller = new AbortController();
+    function refreshResources() {
+      controllerRef.current?.abort();
+      controllerRef.current = new AbortController();
 
       const cycle = ++cycleRef.current;
-      const signal = controller.signal;
+      const signal = controllerRef.current.signal;
       const period = createPeriod();
 
       setResources(current => {
-        const next = { ...current } as DashboardResources;
-
-        for (const key of Object.keys(next) as ResourceKey[]) {
-          next[key].error = undefined;
-          next[key].isLoading = next[key].data === undefined;
-        }
-
-        return next;
+        return Object.fromEntries(
+          Object.entries(current).map(([key, resource]) => [
+            key,
+            {
+              ...resource,
+              error: undefined,
+              isLoading: resource.data === undefined,
+            },
+          ]),
+        ) as DashboardResources;
       });
 
       function load<Key extends ResourceKey>(
@@ -147,26 +155,50 @@ export function useMonitorDashboard() {
           });
       }
 
-      load('health', fetchHealth(signal));
-      load('telemetry', fetchTelemetry(signal));
-      load('hardwareHistory', fetchHardwareHistory(period, signal));
-      load('modelPerformance', fetchModelPerformance(signal));
-      load('modelMetrics', fetchModelMetrics(period, signal));
-      load('recentRequests', fetchRecentRequests(period, signal));
-      load('toolCalls', fetchToolCalls(signal));
-      load('toolStats', fetchToolStats(signal));
+      const healthRequest = fetchHealth(signal);
+      const telemetryRequest = fetchTelemetry(signal);
+      const hardwareHistoryRequest = fetchHardwareHistory(period, signal);
+      const modelPerformanceRequest = fetchModelPerformance(signal);
+      const modelMetricsRequest = fetchModelMetrics(period, signal);
+      const recentRequestsRequest = fetchRecentRequests(period, signal);
+      const toolCallsRequest = fetchToolCalls(signal);
+      const toolStatsRequest = fetchToolStats(signal);
+
+      load('health', healthRequest);
+      load('telemetry', telemetryRequest);
+      load('hardwareHistory', hardwareHistoryRequest);
+      load('modelPerformance', modelPerformanceRequest);
+      load('modelMetrics', modelMetricsRequest);
+      load('recentRequests', recentRequestsRequest);
+      load('toolCalls', toolCallsRequest);
+      load('toolStats', toolStatsRequest);
+
+      void Promise.allSettled([
+        healthRequest,
+        telemetryRequest,
+        hardwareHistoryRequest,
+        modelPerformanceRequest,
+        modelMetricsRequest,
+        recentRequestsRequest,
+        toolCallsRequest,
+        toolStatsRequest,
+      ]).then(() => {
+        if (cycle === cycleRef.current && !signal.aborted) {
+          setIsRefreshing(false);
+        }
+      });
     }
 
-    refresh();
+    refreshResources();
 
-    const interval = window.setInterval(refresh, POLL_INTERVAL_MS);
+    const interval = window.setInterval(refreshResources, POLL_INTERVAL_MS);
 
     return () => {
       window.clearInterval(interval);
-      controller?.abort();
+      controllerRef.current?.abort();
       cycleRef.current += 1;
     };
-  }, []);
+  }, [refreshVersion]);
 
   const lastUpdated = [
     resources.health.updatedAt,
@@ -188,5 +220,7 @@ export function useMonitorDashboard() {
   return {
     ...resources,
     lastUpdated,
+    isRefreshing,
+    refresh,
   };
 }

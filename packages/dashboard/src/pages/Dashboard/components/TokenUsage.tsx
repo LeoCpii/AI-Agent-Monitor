@@ -204,7 +204,7 @@ export default function TokenUsage({ metrics }: TokenUsageProps) {
   }
 
   const { agentModels, summary } = metrics.data;
-  const byModel = toUsageBars(agentModels, row => `${row.provider}/${row.model}`);
+  const byModel = toUsageBars(agentModels, row => row.model);
   const byAgent = toUsageBars(agentModels, row => row.agent);
   const byProvider = toUsageBars(agentModels, row => row.provider);
 

@@ -133,7 +133,7 @@ describe('useMonitorDashboard', () => {
     expect(result.current.toolStats.data).toEqual(toolStats);
   });
 
-  it('polls dashboard resources every thirty seconds', async () => {
+  it('polls dashboard resources every ten seconds', async () => {
     vi.useFakeTimers();
 
     const { result } = renderHook(() => useMonitorDashboard());
@@ -145,11 +145,62 @@ describe('useMonitorDashboard', () => {
     expect(result.current.modelMetrics.data?.summary.requests).toBe(12);
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(30_000);
+      await vi.advanceTimersByTimeAsync(10_000);
     });
 
     expect(fetchModelMetrics).toHaveBeenCalledTimes(2);
     expect(fetchTelemetry).toHaveBeenCalledTimes(2);
+  });
+
+  it('refreshes each dashboard resource on demand', async () => {
+    vi.useFakeTimers();
+
+    const { result } = renderHook(() => useMonitorDashboard());
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    const refresh = (result.current as typeof result.current & { refresh?: () => void }).refresh;
+
+    expect(refresh).toEqual(expect.any(Function));
+
+    await act(async () => {
+      refresh?.();
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    expect(fetchModelMetrics).toHaveBeenCalledTimes(2);
+    expect(fetchTelemetry).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows manual refresh loading until every request settles', async () => {
+    vi.useFakeTimers();
+
+    const { result } = renderHook(() => useMonitorDashboard());
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    const delayedHealth = createDeferred<typeof health>();
+
+    vi.mocked(fetchHealth).mockImplementationOnce(() => delayedHealth.promise);
+
+    act(() => {
+      result.current.refresh();
+    });
+
+    const dashboard = result.current as typeof result.current & { isRefreshing?: boolean };
+
+    expect(dashboard.isRefreshing).toBe(true);
+
+    await act(async () => {
+      delayedHealth.resolve(health);
+      await Promise.resolve();
+    });
+
+    expect(result.current.isRefreshing).toBe(false);
   });
 
   it('retains prior data and marks only failed resources as stale', async () => {
@@ -166,7 +217,7 @@ describe('useMonitorDashboard', () => {
     vi.mocked(fetchTelemetry).mockRejectedValueOnce(new Error('Telemetry unavailable'));
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(30_000);
+      await vi.advanceTimersByTimeAsync(10_000);
     });
 
     expect(result.current.telemetry.isStale).toBe(true);
@@ -196,7 +247,7 @@ describe('useMonitorDashboard', () => {
     expect(failedHealth.isLoading).toBe(false);
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(30_000);
+      await vi.advanceTimersByTimeAsync(10_000);
     });
 
     expect(result.current.health).toMatchObject({
@@ -236,7 +287,7 @@ describe('useMonitorDashboard', () => {
     const { result } = renderHook(() => useMonitorDashboard());
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(30_000);
+      await vi.advanceTimersByTimeAsync(10_000);
     });
 
     expect(fetchTelemetry).toHaveBeenCalledTimes(2);

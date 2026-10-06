@@ -24,7 +24,9 @@ export default function Dashboard() {
       <Stack gap={32}>
         <DashboardHeader
           health={dashboard.health}
+          isRefreshing={dashboard.isRefreshing}
           lastUpdated={dashboard.lastUpdated}
+          onRefresh={dashboard.refresh}
           telemetry={dashboard.telemetry}
         />
         <InfrastructureOverview telemetry={dashboard.telemetry} />

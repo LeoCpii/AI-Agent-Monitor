@@ -41,34 +41,38 @@ function ModelRequests({ requests }: { requests: DashboardResource<RecentModelRe
       ) : requests.data.length === 0 ? (
         <Typography color="text.secondary" variant="body2">No model requests for the last 24 hours.</Typography>
       ) : (
-        <Table fullWidth className={styles.table} sx={{ backgroundColor: ({ background }) => background.muted }}>
-          <TableHeader>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Time</TableCell>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Agent</TableCell>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Model</TableCell>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Provider</TableCell>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Total</TableCell>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Input</TableCell>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Output</TableCell>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Cache</TableCell>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Duration</TableCell>
-          </TableHeader>
-          <TableBody>
-            {requests.data.map(request => (
-              <tr key={`${request.completedAt}:${request.agent}:${request.model}`}>
-                <TableCell><span className={styles.mono}>{formatTime(request.completedAt)}</span></TableCell>
-                <TableCell>{request.agent}</TableCell>
-                <TableCell><span className={styles.mono}>{request.model}</span></TableCell>
-                <TableCell>{request.provider}</TableCell>
-                <TableCell align="right">{formatTokens(request.totalTokens)}</TableCell>
-                <TableCell align="right">{formatTokens(request.inputTokens)}</TableCell>
-                <TableCell align="right">{formatTokens(request.outputTokens)}</TableCell>
-                <TableCell align="right">{formatTokens(request.cacheReadTokens + request.cacheWriteTokens)}</TableCell>
-                <TableCell align="right">{formatDuration(request.durationMs)}</TableCell>
-              </tr>
-            ))}
-          </TableBody>
-        </Table>
+        <div className={styles.tableScroll}>
+          <Table fullWidth className={styles.table} sx={{ backgroundColor: ({ background }) => background.muted }}>
+            <TableHeader>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Time</TableCell>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Agent</TableCell>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Model</TableCell>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Provider</TableCell>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Total</TableCell>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Input</TableCell>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Output</TableCell>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Cache</TableCell>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Duration</TableCell>
+            </TableHeader>
+            <TableBody>
+              {requests.data.map(request => (
+                <tr key={`${request.completedAt}:${request.agent}:${request.model}`}>
+                  <TableCell><span className={styles.mono}>{formatTime(request.completedAt)}</span></TableCell>
+                  <TableCell>{request.agent}</TableCell>
+                  <TableCell><span className={styles.mono}>{request.model}</span></TableCell>
+                  <TableCell>{request.provider}</TableCell>
+                  <TableCell align="right">{formatTokens(request.totalTokens)}</TableCell>
+                  <TableCell align="right">{formatTokens(request.inputTokens)}</TableCell>
+                  <TableCell align="right">{formatTokens(request.outputTokens)}</TableCell>
+                  <TableCell align="right">
+                    {formatTokens(request.cacheReadTokens + request.cacheWriteTokens)}
+                  </TableCell>
+                  <TableCell align="right">{formatDuration(request.durationMs)}</TableCell>
+                </tr>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
       {requests.isStale && <Alert color="warning">Recent request data is stale.</Alert>}
     </Stack>
@@ -98,34 +102,38 @@ function ToolCalls({ toolCalls }: { toolCalls: DashboardResource<ToolCall[]> }) 
       ) : toolCalls.data.length === 0 ? (
         <Typography color="text.secondary" variant="body2">No tool calls recorded.</Typography>
       ) : (
-        <Table fullWidth className={styles.table} sx={{ backgroundColor: ({ background }) => background.muted }}>
-          <TableHeader>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Time</TableCell>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Tool</TableCell>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Status</TableCell>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Target</TableCell>
-            <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Duration</TableCell>
-          </TableHeader>
-          <TableBody>
-            {toolCalls.data.map(call => (
-              <tr key={call.id}>
-                <TableCell><span className={styles.mono}>{formatTime(call.startedAt)}</span></TableCell>
-                <TableCell><span className={styles.mono}>{call.tool}</span></TableCell>
-                <TableCell>
-                  <Chip
-                    color={statusColor(call.status)}
-                    label={call.status}
-                    size="small"
-                    variant="outlined"
-                    style={{ width: 'fit-content' }}
-                  />
-                </TableCell>
-                <TableCell><span className={`${styles.mono} ${styles.target}`}>{getToolTarget(call)}</span></TableCell>
-                <TableCell align="right">{formatDuration(call.durationMs)}</TableCell>
-              </tr>
-            ))}
-          </TableBody>
-        </Table>
+        <div className={styles.tableScroll}>
+          <Table fullWidth className={styles.table} sx={{ backgroundColor: ({ background }) => background.muted }}>
+            <TableHeader>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Time</TableCell>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Tool</TableCell>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Status</TableCell>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Target</TableCell>
+              <TableCell sx={{ backgroundColor: ({ background }) => background.muted }}>Duration</TableCell>
+            </TableHeader>
+            <TableBody>
+              {toolCalls.data.map(call => (
+                <tr key={call.id}>
+                  <TableCell><span className={styles.mono}>{formatTime(call.startedAt)}</span></TableCell>
+                  <TableCell><span className={styles.mono}>{call.tool}</span></TableCell>
+                  <TableCell>
+                    <Chip
+                      color={statusColor(call.status)}
+                      label={call.status}
+                      size="small"
+                      variant="outlined"
+                      style={{ width: 'fit-content' }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <span className={`${styles.mono} ${styles.target}`}>{getToolTarget(call)}</span>
+                  </TableCell>
+                  <TableCell align="right">{formatDuration(call.durationMs)}</TableCell>
+                </tr>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )
       }
       {toolCalls.isStale && <Alert color="warning">Recent tool call data is stale.</Alert>}

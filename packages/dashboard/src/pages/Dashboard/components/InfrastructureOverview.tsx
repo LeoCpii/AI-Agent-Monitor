@@ -134,7 +134,7 @@ export default function InfrastructureOverview({ telemetry }: InfrastructureOver
                     </Typography>
                     <Typography color="text.secondary" variant="body2">Memory usage</Typography>
                   </Stack>
-                  <Progress aria-label="GPU utilization" color="success" percent={gpu.utilization} />
+                  <Progress aria-label="GPU utilization" color="success" percent={ramUsage} />
                 </Stack>
                 <Stack gap={8}>
                   <Metric label="CPU usage" value={`${Math.round(system.cpuUsage)}%`} />

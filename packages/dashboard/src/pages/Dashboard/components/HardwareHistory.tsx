@@ -105,6 +105,7 @@ function ChartPanel({
               />
 
               <Tooltip
+                formatter={value => typeof value === 'number' ? `${value}${unit}` : ''}
                 labelFormatter={value =>
                   typeof value === 'string' ? formatTime(value) : ''
                 }
@@ -197,6 +198,7 @@ export default function HardwareHistory({ history }: HardwareHistoryProps) {
     return (
       <Stack gap={12} tag="section">
         <Typography variant="h2">Hardware History</Typography>
+        {history.isStale && <Alert color="warning">Historical telemetry is stale.</Alert>}
         <Typography color="text.secondary" variant="body2">
           No hardware history for the last 24 hours.
         </Typography>

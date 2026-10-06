@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { useMonitorDashboard } from '@/hooks/useMonitorDashboard';
 
@@ -147,7 +147,9 @@ function dashboardData() {
       isLoading: false,
       isStale: false,
     },
+    isRefreshing: false,
     lastUpdated: new Date('2026-10-05T13:00:00.000Z'),
+    refresh: vi.fn(),
   };
 }
 
@@ -176,10 +178,43 @@ describe('Dashboard', () => {
 
     render(<Dashboard />);
 
-    const [requestTable] = screen.getAllByRole('table');
+    const tables = screen.getAllByRole('table');
+    const [requestTable] = tables;
 
     expect(within(requestTable).queryByRole('columnheader', { name: 'Status' })).not.toBeInTheDocument();
     expect(requestTable.querySelector('thead > tr > tr')).toBeNull();
-    expect(requestTable.closest(`.${styles.tableScroll}`)).not.toBeNull();
+    expect(tables).toHaveLength(2);
+
+    for (const table of tables) {
+      expect(table.closest(`.${styles.tableScroll}`)).not.toBeNull();
+    }
+  });
+
+  it('refreshes dashboard data when Refresh is clicked', () => {
+    const dashboard = {
+      ...dashboardData(),
+      refresh: vi.fn(),
+    };
+
+    vi.mocked(useMonitorDashboard).mockReturnValue(
+      dashboard as ReturnType<typeof useMonitorDashboard>,
+    );
+
+    render(<Dashboard />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh' }));
+
+    expect(dashboard.refresh).toHaveBeenCalledOnce();
+  });
+
+  it('shows a loading Refresh button during a manual refresh', () => {
+    vi.mocked(useMonitorDashboard).mockReturnValue({
+      ...dashboardData(),
+      isRefreshing: true,
+    } as ReturnType<typeof useMonitorDashboard>);
+
+    render(<Dashboard />);
+
+    expect(screen.getByRole('button', { name: /Refreshing/ })).toBeDisabled();
   });
 });

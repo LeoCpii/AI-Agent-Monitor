@@ -58,6 +58,7 @@ export default function ModelPerformance({ performance }: ModelPerformanceProps)
     return (
       <Stack gap={12} tag="section">
         <Typography variant="h2">Model Performance</Typography>
+        {performance.isStale && <Alert color="warning">Model performance data is stale.</Alert>}
         <Typography color="text.secondary" variant="body2">No model performance data recorded.</Typography>
       </Stack>
     );
