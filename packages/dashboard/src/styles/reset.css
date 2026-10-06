@@ -1,5 +1,17 @@
 html {
   box-sizing: border-box;
+  min-height: 100%;
+}
+
+body,
+#root {
+  min-height: 100%;
+  background-color: var(--background-default);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
 }
 
 *,

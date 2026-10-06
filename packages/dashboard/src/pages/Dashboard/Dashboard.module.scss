@@ -1,0 +1,39 @@
+.page {
+  padding: 24px;
+}
+
+// .table {
+//   min-width: 760px;
+// }
+
+.mono {
+  font-family: Consolas, "Courier New", monospace;
+  white-space: nowrap;
+}
+
+.target {
+  display: block;
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 899px) {
+  .page {
+    padding: 16px;
+  }
+
+  .target {
+    max-width: 240px;
+  }
+}
+
+@media (max-width: 599px) {
+  .page {
+    padding: 12px;
+  }
+
+  // .table {
+  //   min-width: 680px;
+  // }
+}
